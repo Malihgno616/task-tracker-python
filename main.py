@@ -49,6 +49,7 @@ class TaskCLI:
         print("\nView yours task's status")
         print("\n1. Todo, 2. In-Progress, 3. Done or 4. Pending")
         status = int(input("Type 1, 2, 3 or 4:"))
+        
         if status == 1:
             self.all_tasks()
         elif status == 2:
