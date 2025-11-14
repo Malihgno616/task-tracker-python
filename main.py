@@ -6,7 +6,7 @@ Requirements
 
 - [] Mark a task as in progress or done
 
-- [] List all tasks
+- [x] List all tasks
 
 - [] List all tasks that are done
 
@@ -65,6 +65,7 @@ class TaskCLI:
         updated_at = date.now().isoformat()
         
         tasks = []
+        # if task.json has been created
         if os.path.exists("task.json"):
             with open("task.json", "r", encoding="utf-8") as f:
                 try:
@@ -79,6 +80,7 @@ class TaskCLI:
                 except json.JSONDecodeError:
                     tasks = []
         else:
+            # if task.json was not created
             with open("task.json", "w", encoding="utf-8") as f:
                 json.dump([], f, indent=5, ensure_ascii=False)
             tasks = []
@@ -128,16 +130,12 @@ class TaskCLI:
                 print("Please, y or n")
 
         return message
-
-    def update_tasks(self):
-        self.clear_cli()
-        print("Update a task")
         
     def view_tasks(self):
         self.clear_cli()
         print("\n---View your tasks---")
         print("\nView yours task's status")
-        print("\n1. Todo, 2. In-Progress, 3. Done or 4. Pending")
+        print("\n1. All Tasks, 2. In-Progress, 3. Done or 4. Pending")
         status = int(input("Type 1, 2, 3 or 4:"))
         
         if status == 1:
@@ -154,8 +152,48 @@ class TaskCLI:
 
     def all_tasks(self):
         self.clear_cli()
-        print("\nAll tasks")
+        print("------All tasks------")
 
+        tasks = []
+        
+        if os.path.exists("task.json"):
+            with open("task.json", "r", encoding="utf-8") as f:
+                try:
+                    tasks = json.load(f)
+                    if isinstance(tasks, dict):
+                        tasks = [tasks]
+                    if not isinstance(tasks, list):
+                        tasks = []
+                except json.JSONDecodeError:
+                    tasks = []
+
+        if not tasks:
+            print("No tasks found")
+        else:
+            for task in tasks:
+                print(f"""
+                --------------------------
+                ID: {task['id']}
+                Title: {task['title']}
+                Description: {task['description']}
+                Status: {task['status']}
+                Created At: {task['createdAt']}
+                Updated At: {task['updatedAt']}
+                --------------------------
+                """)
+
+        while True:
+            return_btn = int(input("\nPress 1 to return to the menu: "))       
+            if return_btn == 1:
+                return self.generate_interface()
+                break
+            else:
+                print("Invalid Option!!!")
+    
+    def update_tasks(self):
+        self.clear_cli()
+        print("Update a task")
+        
     def tasks_pending(self):
         self.clear_cli()
         print("\nPending tasks...")
