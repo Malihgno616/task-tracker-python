@@ -2,6 +2,7 @@
 Requirements
 
 - [] Add, Update, and Delete tasks
+- [x] Created a function to read a task by id
 - [x] Created a function to add a task
 
 - [] Mark a task as in progress or done
@@ -35,13 +36,19 @@ class TaskCLI:
         self.generate_title()
         print("1. Create Task")
         print("\n2. View your Tasks")
-        print("\n3. Exit\n")   
-        input_option = int(input("Select an option (1, 2 or 3): " ))
+        print("\n3. Select a task")
+        print("\n4. Update a task")
+        print("\n5. Exit\n")   
+        input_option = int(input("Select an option (1, 2, 3, 4 or 5): " ))
         if input_option == 1:
             self.create_tasks()
         elif input_option == 2:
             self.view_tasks()
         elif input_option == 3:
+            self.read_task()
+        elif input_option == 4:
+            self.update_task()
+        elif input_option == 5:
             self.exit_task_cli()  
         else:
             print("Opção inválida")
@@ -190,6 +197,41 @@ class TaskCLI:
             else:
                 print("Invalid Option!!!")
     
+    def read_task(self):
+        self.clear_cli()
+        tasks = []
+        if os.path.exists("task.json"):
+            with open("task.json", "r", encoding="utf-8") as f:
+                try:
+                    tasks = json.load(f)
+                    if isinstance(tasks, dict):
+                        tasks = [tasks]
+                except json.JSONDecodeError:
+                    print("Error reading tasks file.")
+                    return None
+        else:
+            print("No tasks found.")
+            return None
+
+        print("Available tasks:")
+        for task in tasks:
+            print(f"ID: {task['id']} | Title: {task['title']}")
+
+        while True:
+            try:
+                task_id = int(input("\nSelect a task ID: "))    
+                for task in tasks:
+                    if task["id"] == task_id:
+                        self.clear_cli()
+                        print("Task selected:")
+                        print(json.dumps(task, indent=4))
+                        return task        
+
+                print("Task not found. Try again.\n")
+                
+            except ValueError:
+                print("Invalid ID. You must enter a number.\n")         
+            
     def update_tasks(self):
         self.clear_cli()
         print("Update a task")
@@ -211,7 +253,4 @@ class TaskCLI:
         print("Goodbye!!!")
         
 interface = TaskCLI()
-
-while True:
-    interface.generate_interface()
-    break
+interface.generate_interface()
