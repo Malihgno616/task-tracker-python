@@ -1,12 +1,10 @@
 """
-Requirements
-
 - [] Add, Update, and Delete tasks
 - [x] Created a function to read a task by id
 - [x] Created a function to add a task
-
-- [] Mark a task as in progress or done
-
+- [x] Created a function to update a task
+- [x] You can mark a task as in-progress, pending or done
+- [x] You can mark a task as in progress or done
 - [x] List all tasks
 
 - [] List all tasks that are done
@@ -232,10 +230,133 @@ class TaskCLI:
             except ValueError:
                 print("Invalid ID. You must enter a number.\n")         
             
-    def update_tasks(self):
+    def update_task(self):
         self.clear_cli()
-        print("Update a task")
-        
+        print("Update a task\n")
+
+        if not os.path.exists("task.json"):
+            print("No tasks found.")
+            input("\nPress ENTER to return...")
+            return self.generate_interface()
+
+        try:
+            with open("task.json", "r", encoding="utf-8") as f:
+                tasks = json.load(f)
+                if isinstance(tasks, dict):
+                    tasks = [tasks]
+        except json.JSONDecodeError:
+            print("Error reading tasks file.")
+            input("\nPress ENTER to return...")
+            return self.generate_interface()
+
+        if not tasks:
+            print("No tasks found.")
+            input("\nPress ENTER to return...")
+            return self.generate_interface()
+
+        print("Available tasks:")
+        for task in tasks:
+            print(f"ID: {task['id']} | Title: {task['title']}")
+
+        while True:
+            try:
+                update_id = int(input("\nSelect a task to update: "))
+                break
+            except ValueError:
+                print("Invalid number. Try again.")
+
+        task_found = None
+        for task in tasks:
+            if task["id"] == update_id:
+                task_found = task
+                break
+
+        if not task_found:
+            print("Task not found.")
+            input("\nENTER to return...")
+            return self.generate_interface()
+
+        self.clear_cli()
+        print("Task selected:")
+        print(json.dumps(task_found, indent=4))
+
+        print("\n1. Update title")
+        print("2. Update description")
+        print("3. Update status (todo, in-progress, pending, done)")
+        print("4. Cancel")
+
+        try:
+            option_update = int(input("Select an option: "))
+        except ValueError:
+            print("Invalid option.")
+            input("\nENTER to return...")
+            return self.generate_interface()
+
+        if option_update == 1:
+            update_title = input("New title: ").strip()
+            if not update_title:
+                print("\nTitle cannot be empty!")
+                input("Press ENTER to try again...")
+                return self.update_task()
+            task_found["title"] = update_title
+
+        elif option_update == 2:
+            update_description = input("New description: ").strip()
+            if not update_description:
+                print("\nDescription cannot be empty!")
+                input("Press ENTER to try again...")
+                return self.update_task()
+            task_found["description"] = update_description
+
+        elif option_update == 3:
+            update_status = input("New status (todo, in-progress, pending, done): ").strip().lower()
+            if update_status not in ["todo", "in-progress", "pending", "done"]:
+                print("\nInvalid status!")
+                input("Press ENTER to try again...")
+                return self.update_task()
+            task_found["status"] = update_status
+
+        elif option_update == 4:
+            return self.generate_interface()
+
+        else:
+            print("Invalid option.")
+            input("\nENTER to continue...")
+            return self.generate_interface()
+
+        task_found["updatedAt"] = date.now().isoformat()
+
+        with open("task.json", "w", encoding="utf-8") as f:
+            json.dump(tasks, f, indent=4, ensure_ascii=False)
+
+        print("\nTask updated successfully!")
+        print(json.dumps(task_found, indent=4))
+
+        input("\nPress ENTER to return...")
+        self.generate_interface()
+
+    # def delete_task(self):
+    #     self.clear_cli()
+    #     if not os.path.exists("task.json"):
+    #         print("No tasks found.")
+    #         input("\nPress ENTER to return...")
+    #         return self.generate_interface()
+
+    #     try:
+    #         with open("task.json", "r", encoding="utf-8") as f:
+    #             tasks = json.load(f)
+    #             if isinstance(tasks, dict):
+    #                 tasks = [tasks]
+    #     except json.JSONDecodeError:
+    #         print("Error reading tasks file.")
+    #         input("\nPress ENTER to return...")
+    #         return self.generate_interface()
+
+    #     self.clear_cli()
+    #     for task in tasks:
+    #         print(f"ID: {task['id']} | Title: {task['title']}")
+
+
     def tasks_pending(self):
         self.clear_cli()
         print("\nPending tasks...")
