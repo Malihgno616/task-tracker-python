@@ -7,11 +7,11 @@
 - [x] You can mark a task as in progress or done
 - [x] List all tasks
 
-- [] List all tasks that are done
+- [x] List all tasks that are done
 
-- [] List all tasks that are not done
+- [x] List all tasks that are not done
 
-- [] List all tasks that are in progress
+- [x] List all tasks that are in progress
 
 """
 import os 
@@ -157,46 +157,6 @@ class TaskCLI:
         else: 
             print("Opção inválido")
             return self.view_tasks()
-
-    def all_tasks(self):
-        self.clear_cli()
-        print("------All tasks------")
-
-        tasks = []
-        
-        if os.path.exists("task.json"):
-            with open("task.json", "r", encoding="utf-8") as f:
-                try:
-                    tasks = json.load(f)
-                    if isinstance(tasks, dict):
-                        tasks = [tasks]
-                    if not isinstance(tasks, list):
-                        tasks = []
-                except json.JSONDecodeError:
-                    tasks = []
-
-        if not tasks:
-            print("No tasks found")
-        else:
-            for task in tasks:
-                print(f"""
-                --------------------------
-                ID: {task['id']}
-                Title: {task['title']}
-                Description: {task['description']}
-                Status: {task['status']}
-                Created At: {task['createdAt']}
-                Updated At: {task['updatedAt']}
-                --------------------------
-                """)
-
-        while True:
-            return_btn = int(input("\nPress 1 to return to the menu: "))       
-            if return_btn == 1:
-                return self.generate_interface()
-                break
-            else:
-                print("Invalid Option!!!")
     
     def read_task(self):
         self.clear_cli()
@@ -397,17 +357,135 @@ class TaskCLI:
         input("\nPress ENTER to return...")
         return self.generate_interface()
 
+    def all_tasks(self):
+        self.clear_cli()
+        print("------All tasks------")
+
+        tasks = []
+        
+        if os.path.exists("task.json"):
+            with open("task.json", "r", encoding="utf-8") as f:
+                try:
+                    tasks = json.load(f)
+                    if isinstance(tasks, dict):
+                        tasks = [tasks]
+                    if not isinstance(tasks, list):
+                        tasks = []
+                except json.JSONDecodeError:
+                    tasks = []
+
+        if not tasks:
+            print("No tasks found")
+        else:
+            for task in tasks:
+                print(f"""
+                --------------------------
+                ID: {task['id']}
+                Title: {task['title']}
+                Description: {task['description']}
+                Status: {task['status']}
+                Created At: {task['createdAt']}
+                Updated At: {task['updatedAt']}
+                --------------------------
+                """)
+
+        while True:
+            return_btn = int(input("\nPress 1 to return to the menu: "))       
+            if return_btn == 1:
+                return self.generate_interface()
+                break
+            else:
+                print("Invalid Option!!!")
+    
     def tasks_pending(self):
         self.clear_cli()
         print("\nPending tasks...")
+        tasks = []   
+        if os.path.exists("task.json"):
+            with open("task.json", "r", encoding="utf-8") as f:
+                try:
+                    tasks = json.load(f)
+                    if isinstance(tasks, dict):
+                        tasks = [tasks]
+                    if not isinstance(tasks, list):
+                        tasks = []
+                except json.JSONDecodeError:
+                    tasks = []
+
+        progress = [t for t in tasks if t["status"] == "pending"]
+
+        if not progress:
+            print("No tasks pending")
+        else:
+            for tasks in progress:
+                print(f"""--------------------------\nID: {tasks["id"]}\nTitle: {tasks["title"]}\nStatus: {tasks["status"]}\n--------------------------""")     
+
+        while True:
+            return_btn = input("Press 1 to return: ").strip()
+            if return_btn == "1":
+                return self.generate_interface()
+            else:
+                print("Invalid option.")
 
     def tasks_in_progress(self):
         self.clear_cli()
         print("\nIn-Progress tasks...")
+        tasks = []     
+        if os.path.exists("task.json"):
+            with open("task.json", "r", encoding="utf-8") as f:
+                try:
+                    tasks = json.load(f)
+                    if isinstance(tasks, dict):
+                        tasks = [tasks]
+                    if not isinstance(tasks, list):
+                        tasks = []
+                except json.JSONDecodeError:
+                    tasks = []
+        progress = [t for t in tasks if t["status"] == "in-progress"]
+
+        if not progress:
+            print("No tasks in progress")
+        else:
+            for tasks in progress:
+                for tasks in progress:
+                    print(f"""--------------------------\nID: {tasks["id"]}\nTitle: {tasks["title"]}\nStatus: {tasks["status"]}\n--------------------------""") 
+
+        while True:
+            return_btn = input("Press 1 to return: ").strip()
+            if return_btn == "1":
+                return self.generate_interface()
+            else:
+                print("Invalid option.")
 
     def done_tasks(self):
         self.clear_cli()
         print("\nDone tasks")
+        tasks = []   
+        if os.path.exists("task.json"):
+            with open("task.json", "r", encoding="utf-8") as f:
+                try:
+                    tasks = json.load(f)
+                    if isinstance(tasks, dict):
+                        tasks = [tasks]
+                    if not isinstance(tasks, list):
+                        tasks = []
+                except json.JSONDecodeError:
+                    tasks = []
+        progress = [t for t in tasks if t["status"] == "done"]
+
+        if not progress:
+            print("No tasks in progress")
+        else:
+            for tasks in progress:
+                for tasks in progress:
+                    print(f"""--------------------------\nID: {tasks["id"]}\nTitle: {tasks["title"]}\nStatus: {tasks["status"]}\n--------------------------""") 
+
+        while True:
+            return_btn = input("Press 1 to return: ").strip()
+            if return_btn == "1":
+                return self.generate_interface()
+            else:
+                print("Invalid option.")
     
     def exit_task_cli(self):
         self.clear_cli()
