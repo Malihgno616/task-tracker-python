@@ -1,5 +1,5 @@
 """
-- [] Add, Update, and Delete tasks
+- [x] Add, Update, and Delete tasks
 - [x] Created a function to read a task by id
 - [x] Created a function to add a task
 - [x] Created a function to update a task
@@ -36,8 +36,9 @@ class TaskCLI:
         print("\n2. View your Tasks")
         print("\n3. Select a task")
         print("\n4. Update a task")
-        print("\n5. Exit\n")   
-        input_option = int(input("Select an option (1, 2, 3, 4 or 5): " ))
+        print("\n5. Delete a task")
+        print("\n6. Exit\n")   
+        input_option = int(input("Select an option (1, 2, 3, 4, 5 or 6): " ))
         if input_option == 1:
             self.create_tasks()
         elif input_option == 2:
@@ -47,7 +48,9 @@ class TaskCLI:
         elif input_option == 4:
             self.update_task()
         elif input_option == 5:
-            self.exit_task_cli()  
+            self.delete_task()  
+        elif input_option == 6:
+            self.exit_task_cli()
         else:
             print("Opção inválida")
             return self.generate_interface()
@@ -335,27 +338,64 @@ class TaskCLI:
         input("\nPress ENTER to return...")
         self.generate_interface()
 
-    # def delete_task(self):
-    #     self.clear_cli()
-    #     if not os.path.exists("task.json"):
-    #         print("No tasks found.")
-    #         input("\nPress ENTER to return...")
-    #         return self.generate_interface()
+    def delete_task(self):
+        self.clear_cli()
+        if not os.path.exists("task.json"):
+            print("No tasks found.")
+            input("\nPress ENTER to return...")
+            return self.generate_interface()
 
-    #     try:
-    #         with open("task.json", "r", encoding="utf-8") as f:
-    #             tasks = json.load(f)
-    #             if isinstance(tasks, dict):
-    #                 tasks = [tasks]
-    #     except json.JSONDecodeError:
-    #         print("Error reading tasks file.")
-    #         input("\nPress ENTER to return...")
-    #         return self.generate_interface()
+        try:
+            with open("task.json", "r", encoding="utf-8") as f:
+                tasks = json.load(f)
+                if isinstance(tasks, dict):
+                    tasks = [tasks]
+        except json.JSONDecodeError:
+            print("Error reading tasks file.")
+            input("\nPress ENTER to return...")
+            return self.generate_interface()
 
-    #     self.clear_cli()
-    #     for task in tasks:
-    #         print(f"ID: {task['id']} | Title: {task['title']}")
+        self.clear_cli()
+        for task in tasks:
+            print(f"ID: {task['id']} | Title: {task['title']}")
+        
+        while True:
+            try:
+                delete_id = int(input("Select a ID to delete: "))
+                break
+            except ValueError:
+                print("Invalid input. Try again...")
 
+        task_to_delete = None
+        for task in tasks:
+            if task["id"] == delete_id:
+                task_to_delete = task
+                break
+
+        if task_to_delete is None:
+            print("\nTask not found!")
+            input("Press ENTER to return...")
+            return self.generate_interface()
+
+        print("\nTask selected:")
+        print(json.dumps(task_to_delete, indent=4))
+
+        confirm = input("\nAre you sure you want to delete this task? (y/n): ").strip().lower()
+
+        if confirm != "y":
+            print("\nDeletion cancelled.")
+            input("\nPress ENTER to return...")
+            return self.generate_interface()
+
+        tasks = [t for t in tasks if t["id"] != delete_id]
+
+        with open("task.json", "w", encoding="utf-8") as f:
+            json.dump(tasks, f, indent=4, ensure_ascii=False)
+
+        print("\nTask deleted successfully!")
+
+        input("\nPress ENTER to return...")
+        return self.generate_interface()
 
     def tasks_pending(self):
         self.clear_cli()
